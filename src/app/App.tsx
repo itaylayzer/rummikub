@@ -1,9 +1,7 @@
-import AssetLoader from "../components/AssetLoader";
 import { useStyles } from "../hooks/useStyles";
 import { useApScreens } from "../viewmodels";
 
 function App() {
-    console.log("hi!!");
     useApScreens();
 
     return (
@@ -49,8 +47,4 @@ const styles = useStyles({
     },
 });
 
-export default () => (
-    <AssetLoader items={{ board: "textures/board2.png" }}>
-        <App />
-    </AssetLoader>
-);
+export default () => <App />;

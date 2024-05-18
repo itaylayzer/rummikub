@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { createLight } from "./lib/createLights";
-import { loadedAssets } from "../viewmodels/useAssetLoader";
 import { Player } from "./data/Player";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { Stack } from "./data/Stack";
@@ -8,10 +7,11 @@ import { Stack } from "./data/Stack";
 const colors = {
     background: "#24549c",
     board: "#c0c0c0",
-    wood: "#e22a32",
+    red: "#e22a32",
+    darkred: "#962126",
 };
 const distance = 32;
-export default (assets: loadedAssets) => {
+export default () => {
     const container = document.querySelector("div.gameContainer") as HTMLDivElement;
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -22,12 +22,12 @@ export default (assets: loadedAssets) => {
     scene.background = new THREE.Color(colors.background);
 
     const camera = new THREE.OrthographicCamera(
-        container.clientWidth / -distance,
-        container.clientWidth / distance,
-        container.clientHeight / distance,
-        container.clientHeight / -distance,
-        1,
-        1000
+        window.innerWidth / -30,
+        window.innerWidth / 30,
+        window.innerHeight / 30,
+        window.innerHeight / -30,
+        -150,
+        150
     );
     camera.position.set(distance, distance, distance * 2);
 
@@ -65,14 +65,23 @@ export default (assets: loadedAssets) => {
     const updates: (() => void)[] = [];
 
     function _createMap() {
-        scene.add(
-            new THREE.Mesh(
-                new THREE.BoxGeometry(60, 1, 60),
-                new THREE.MeshBasicMaterial({
-                    color: colors.wood,
-                })
-            )
+        const ground1 = new THREE.Mesh(
+            new THREE.BoxGeometry(60, 1, 60),
+            new THREE.MeshBasicMaterial({
+                color: colors.red,
+            })
         );
+        const ground2 = new THREE.Mesh(
+            new THREE.BoxGeometry(60, 1, 60),
+            new THREE.MeshBasicMaterial({
+                color: colors.darkred,
+            })
+        );
+        ground1.position.y = 0.5;
+
+        ground2.position.y = -0.5;
+
+        scene.add(ground2, ground1);
 
         const xmplayer = new Player();
         scene.add(xmplayer);
@@ -82,20 +91,20 @@ export default (assets: loadedAssets) => {
 
         const stepX = 2.25;
 
-        const iX = -3.5;
+        const iX = -4;
         const stepY = 2;
 
         scene.add(new Stack(7, new THREE.Vector3(iX + -stepX * 2, 0, -stepY)));
         scene.add(new Stack(7, new THREE.Vector3(iX + -stepX, 0, -stepY)));
+        scene.add(new Stack(7, new THREE.Vector3(iX, 0, -stepY)));
         scene.add(new Stack(7, new THREE.Vector3(iX + stepX, 0, -stepY)));
         scene.add(new Stack(7, new THREE.Vector3(iX + stepX * 2, 0, -stepY)));
-        scene.add(new Stack(7, new THREE.Vector3(iX + -stepX * 0, 0, stepY)));
-        scene.add(new Stack(7, new THREE.Vector3(iX + -stepX * 0, 0, -stepY)));
-        scene.add(new Stack(7, new THREE.Vector3(iX + -stepX * 2, 0, stepY)));
-        scene.add(new Stack(7, new THREE.Vector3(iX + -stepX, 0, stepY)));
-        scene.add(new Stack(7, new THREE.Vector3(iX + stepX, 0, stepY)));
-        scene.add(new Stack(7, new THREE.Vector3(iX + stepX * 2, 0, stepY)));
-        scene.add(new Stack(5, new THREE.Vector3(-iX, 0, 0)));
+        scene.add(new Stack(6, new THREE.Vector3(iX + -stepX * 2, 0, stepY)));
+        scene.add(new Stack(6, new THREE.Vector3(iX + -stepX, 0, stepY)));
+        scene.add(new Stack(6, new THREE.Vector3(iX, 0, +stepY)));
+        scene.add(new Stack(5, new THREE.Vector3(iX + stepX, 0, stepY)));
+        scene.add(new Stack(3, new THREE.Vector3(iX + stepX * 2, 0, stepY)));
+        scene.add(new Stack(2, new THREE.Vector3(-iX, 0, 0)));
 
         updates.push(() => {
             xmplayer.update();
